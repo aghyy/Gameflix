@@ -1,5 +1,5 @@
 package com.aghyy.gameflix.library
 
 interface GamingLibrary {
-    fun getGames(): List<Game>
+    fun getGames(): List<GameCategory>
 }
