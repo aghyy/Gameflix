@@ -21,9 +21,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -114,13 +120,45 @@ fun GameLibraryScreen(
     library: GamingLibrary = InMemoryGamingLibrary(),
     navController: NavController
 ) {
+    var searchQuery by remember { mutableStateOf("") }
     val categories = library.getGames()
+    val filteredCategories = if (searchQuery.isBlank()) {
+        categories
+    } else {
+        categories.mapNotNull { category ->
+            val filteredGames = category.games.filter { it.title.contains(searchQuery, ignoreCase = true) }
+            if (filteredGames.isNotEmpty()) {
+                category.copy(games = filteredGames)
+            } else {
+                null
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Gameflix", color = Color(0xFFE50914), fontWeight = FontWeight.Bold, fontSize = 24.sp) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF141414))
-            )
+            Column(modifier = Modifier.background(Color(0xFF141414))) {
+                TopAppBar(
+                    title = { Text("Gameflix", color = Color(0xFFE50914), fontWeight = FontWeight.Bold, fontSize = 24.sp) },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                )
+                TextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = { Text("Search", color = Color.Gray) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color(0xFF2C2C2C),
+                        unfocusedContainerColor = Color(0xFF2C2C2C),
+                        disabledContainerColor = Color(0xFF2C2C2C),
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        cursorColor = Color(0xFFE50914)
+                    )
+                )
+            }
         },
         containerColor = Color(0xFF141414)
     ) { paddingValues ->
@@ -129,13 +167,26 @@ fun GameLibraryScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            items(categories) { category ->
-                GameCategoryRow(
-                    category = category,
-                    onGameClick = { gameId ->
-                        navController.navigate("gameDetail/$gameId")
+            if (filteredCategories.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No games found.", color = Color.White)
                     }
-                )
+                }
+            } else {
+                items(filteredCategories) { category ->
+                    GameCategoryRow(
+                        category = category,
+                        onGameClick = { gameId ->
+                            navController.navigate("gameDetail/$gameId")
+                        }
+                    )
+                }
             }
         }
     }
