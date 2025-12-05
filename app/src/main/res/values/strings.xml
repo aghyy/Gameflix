@@ -1,3 +1,33 @@
 <resources>
     <string name="app_name">Gameflix</string>
+    <string name="no_image">No image</string>
+    <string name="content_description_open_favorites">Open favorites</string>
+    <string name="content_description_search">Search</string>
+    <string name="content_description_clear_search">Clear search</string>
+    <string name="search_bar_placeholder">Search for any game</string>
+    <string name="loading_curated_picks">Loading curated picks\u2026</string>
+    <string name="searching_games">Searching games\u2026</string>
+    <string name="search_results_header">Search results</string>
+    <string name="category_medieval_strategy">Medieval strategy picks</string>
+    <string name="category_similar_stronghold">Similar to Stronghold</string>
+    <string name="empty_state_message">No games available right now.</string>
+    <string name="featured_game_by">by %1$s</string>
+    <string name="button_retry">Retry</string>
+    <string name="favorites_title">Favorites</string>
+    <string name="content_description_back">Back</string>
+    <string name="content_description_delete_all">Delete all favorites</string>
+    <string name="content_description_delete_favorite">Remove from favorites</string>
+    <string name="loading_favorites">Loading favorites\u2026</string>
+    <string name="empty_favorites_message">No favorites saved yet.</string>
+    <string name="favorite_saved_at">Saved at %1$s</string>
+    <string name="content_description_add_favorite">Add to favorites</string>
+    <string name="detail_title_fallback">Game details</string>
+    <string name="detail_developer">Developer: %1$s</string>
+    <string name="detail_release_date">Release date: %1$s</string>
+    <string name="detail_screenshots">Screenshots</string>
+    <string name="content_description_screenshot">Screenshot</string>
+    <string name="content_description_toggle_favorite">Toggle favorite</string>
+    <string name="error_missing_game_id">Missing game id.</string>
+    <string name="error_no_game_details">We could not find details for this game.</string>
+    <string name="error_unable_load_details">Unable to load game details.</string>
 </resources>

@@ -6,7 +6,8 @@ data class Game(
     val thumbnailUrl: String,
     val description: String,
     val developer: String,
-    val releaseDate: String
+    val releaseDate: String,
+    val screenshots: List<String> = emptyList()
 )
 
 data class GameCategory(val title: String, val games: List<Game>)

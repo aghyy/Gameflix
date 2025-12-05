@@ -1,5 +1,7 @@
 package com.aghyy.gameflix.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,8 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,26 +37,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.res.stringResource
+import com.aghyy.gameflix.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameDetailScreen(
     navController: NavController,
     uiState: GameDetailUiState,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
+    onToggleFavorite: () -> Unit,
+    onScreenshotSelected: (String) -> Unit,
+    onScreenshotDismissed: () -> Unit
 ) {
-    val title = uiState.game?.title ?: "Game details"
+    val title = uiState.game?.title ?: stringResource(R.string.detail_title_fallback)
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(title, maxLines = 1) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.content_description_back))
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onToggleFavorite, enabled = uiState.game != null) {
+                        val icon = if (uiState.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
+                        Icon(icon, contentDescription = stringResource(R.string.content_description_toggle_favorite))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -89,7 +106,7 @@ fun GameDetailScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = onRetry) {
-                        Text("Try again")
+                        Text(stringResource(R.string.button_retry))
                     }
                 }
             }
@@ -120,20 +137,20 @@ fun GameDetailScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Developer: ${game.developer}",
+                        text = stringResource(R.string.detail_developer, game.developer),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.LightGray
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Release Date: ${game.releaseDate}",
+                        text = stringResource(R.string.detail_release_date, game.releaseDate),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.LightGray
                     )
                     if (game.screenshots.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Screenshots",
+                            text = stringResource(R.string.detail_screenshots),
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.White
                         )
@@ -145,10 +162,11 @@ fun GameDetailScreen(
                                     modifier = Modifier
                                         .width(220.dp)
                                         .height(140.dp)
+                                        .clickable { onScreenshotSelected(screenshot) }
                                 ) {
                                     SubcomposeAsyncImage(
                                         model = screenshot,
-                                        contentDescription = "Screenshot",
+                                        contentDescription = stringResource(R.string.content_description_screenshot),
                                         contentScale = ContentScale.Crop
                                     )
                                 }
@@ -156,6 +174,29 @@ fun GameDetailScreen(
                         }
                     }
                 }
+            }
+        }
+    }
+    uiState.expandedScreenshotUrl?.let { screenshot ->
+        Dialog(
+            onDismissRequest = onScreenshotDismissed,
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.9f))
+                    .clickable { onScreenshotDismissed() },
+                contentAlignment = Alignment.Center
+            ) {
+                SubcomposeAsyncImage(
+                    model = screenshot,
+                    contentDescription = stringResource(R.string.content_description_screenshot),
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp)
+                )
             }
         }
     }
